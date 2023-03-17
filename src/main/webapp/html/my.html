@@ -1,11 +1,263 @@
+<!DOCTYPE html>
+
 <html>
 <head>
     <title>RPG</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
     <link href="/css/my.css" rel="stylesheet">
 </head>
 <body>
 <h1>RPG admin panel</h1>
+<div id="pagination">
+    <label for="accountsPerPage">Show accounts per page:</label>
+    <select id="accountsPerPage" onchange="getPlayers()">
+        <option value="3">3</option>
+        <option value="5" selected>5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+    </select>
+</div>
+<table id="my-table">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Title</th>
+        <th>Race</th>
+        <th>Profession</th>
+        <th>Level</th>
+        <th>Birthday</th>
+        <th>Banned</th>
+        <th>Edit</th>
+        <th>Delete</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+
+
+<div id="paging-buttons">
+    <label for="accountsPerPage">Pages:</label>
+
+</div>
+
+<div id="input">
+    <label for="input">input</label>
+</div>
+<h1>createPlayer </h1>
+
+
+    <label for="input_name">name</label>
+    <input type="text" id="input_name" name="name">
+    <label for="input_title">title</label>
+    <input type="text" id="input_title" name="title">
+    <label for="input_races">races</label>
+    <select id="input_races" name="race">
+        <option value="Human">Human</option>
+        <option value="Elf">Elf</option>
+        <option value="Dwarf">Dwarf</option>
+        <option value="Orc">Orc</option>
+        <option value="Giant">Giant</option>
+    </select>
+    <label for="input_professions">professions</label>
+    <select id="input_professions" name="profession">
+        <option value="Warrior">Warrior</option>
+        <option value="Rogue">Rogue</option>
+        <option value="Sorcerer">Sorcerer</option>
+        <option value="Mage">Mage</option>
+        <option value="Paladin">Paladin</option>
+    </select>
+
+<label for="input_level">level</label>
+<input type="number" id="input_level" name="level" min="0" max="100">
+
+    <input type="date" id="input_date" name="birthday">
+     <label for="input_banned">banned</label>
+<select id="input_banned" name="banned">
+        <option value='true'>true</option>
+        <option value='false'>false</option>
+    </select>
+    <button onclick="createPlayer2()">create</button>
+
+<script>
+
+
+    function getPlayers(pageNumber) {
+        pageNumber = pageNumber || 8;
+        let countPerPage = $("#accountsPerPage").val();
+        countPerPage = countPerPage || 5;
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/rest/players?pageNumber=' + pageNumber + '&pageSize=' + countPerPage);
+        xhr.onload = function () {
+            var editIcon = 0;
+            var deleteIcon = 0;
+            if (xhr.status === 200) {
+                var players = JSON.parse(xhr.responseText);
+                var tableBody = document.querySelector('#my-table tbody');
+                tableBody.innerHTML = "";
+                players.forEach(function (player, index) {
+                    var row = tableBody.insertRow();
+                    var numberCell = row.insertCell(0);
+                    var nameCell = row.insertCell(1);
+                    var titleCell = row.insertCell(2);
+                    var raceCell = row.insertCell(3);
+                    var professionCell = row.insertCell(4);
+                    var levelCell = row.insertCell(5);
+                    var birthdayCell = row.insertCell(6);
+                    var bannedCell = row.insertCell(7);
+                    var editCell = row.insertCell(8);
+                    var deleteCell = row.insertCell(9);
+                    editIcon = document.createElement('img');
+                    deleteIcon = document.createElement('img');
+                    editIcon.src = '/img/edit.png';
+                    deleteIcon.src = '/img/delete.png';
+                    deleteIcon.onclick = function () {
+                        deletePlayer(player.id);
+                    };
+                    editIcon.onclick = function () {
+                        editAccount(player.id);
+                    };
+                    editCell.appendChild(editIcon);
+                    deleteCell.appendChild(deleteIcon);
+                    numberCell.textContent = player.id;
+                    nameCell.textContent = player.name;
+                    titleCell.textContent = player.title;
+                    raceCell.textContent = player.race;
+                    professionCell.textContent = player.profession;
+                    levelCell.textContent = player.level;
+                    birthdayCell.textContent = player.birthday;
+                    bannedCell.textContent = player.banned;
+
+                });
+
+            } else {
+                console.log('Ошибка: ' + xhr.status);
+            }
+        };
+        xhr.send();
+        main();
+    }
+
+
+    async function main() {
+        let totalCount = await getTotalAccountCount();
+        let countPerPage = $("#accountsPerPage").val();
+        if (countPerPage == null) {
+            countPerPage = 3;
+        }
+
+        async function getTotalAccountCount() {
+            const data = await $.get("/rest/players/count");
+            console.log("Total account count: " + data);
+            return parseInt(data);
+        }
+
+
+        let totalPages1 = Math.ceil(totalCount / countPerPage);
+
+        console.log("Total account count: " + totalCount);
+        console.log("Total countPerPage: " + countPerPage);
+        console.log("Total totalPages1: " + totalPages1);
+        $("#paging-buttons").empty()
+
+        for (let i = 0; i < totalPages1; i++) {
+
+
+            let button_tag = "<button>" + (i + 1) + "</button>";
+            let btn = $(button_tag)
+                .attr("id", "paging_button_" + i)
+                .attr("onclick", "getPlayers(" + (i + 1) + ")")
+                .addClass("pgn-btn-styled");
+
+            $("#paging-buttons").append(btn);
+
+        }
+
+
+        $(".pgn-btn-styled").on("click", function () {
+            $(".pgn-btn-styled").css("background-color", ""); // сбрасываем цвет всех кнопок
+            $(this).css("background-color", "red"); // окрашиваем нажатую кнопку в красный цвет
+
+        });
+
+
+    }
+
+    function deletePlayer(id) {
+        fetch('/rest/players/' + id, {
+            method: 'DELETE'
+        })
+            .then(function () {
+                getPlayers();
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+
+
+
+
+
+
+    // добавляем элементы на страницу
+
+
+    // с помощью jQuery обращаемся к элементам на странице по их именам
+    function createPlayer2() {
+        let val_name = $("#input_name").val();
+        let val_title = $("#input_title").val();
+        let val_race = $("#input_races").val();
+        let val_profession = $("#input_professions").val();
+        let val_level = $("#input_level").val();
+        let val_banned = $("#input_banned").val();
+        let val_birthday = $("#input_date").val();
+
+        console.log(val_name);
+        console.log(val_title);
+        console.log(val_race);
+        console.log(val_profession);
+        console.log(val_level);
+        console.log(val_banned);
+        console.log(val_birthday);
+        let url = "/rest/players";
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            contentType: 'application/json;charset=UTF-8',
+            async: false,
+            data: JSON.stringify({
+                "name": val_name,
+                "title": val_title,
+                "race": val_race,
+                "profession": val_profession,
+                "banned": val_banned,
+                "level": val_level,
+                "birthday": new Date(val_birthday).getTime()
+            }),
+            success: function () {
+                $("#input_name").val("");
+                $("#input_title").val("");
+                $("#input_races").val("");
+                $("#input_professions").val("");
+                $("#input_level").val("");
+                $("#input_banned").val("");
+                $("#input_date").val("");
+           getPlayers();
+            }
+
+        });
+    }
+
+
+</script>
+
 
 </body>
 </html>
