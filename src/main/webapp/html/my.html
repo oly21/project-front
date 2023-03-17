@@ -47,40 +47,51 @@
 <div id="input">
     <label for="input">input</label>
 </div>
-<h1>createPlayer </h1>
-
-
-    <label for="input_name">name</label>
-    <input type="text" id="input_name" name="name">
-    <label for="input_title">title</label>
-    <input type="text" id="input_title" name="title">
-    <label for="input_races">races</label>
-    <select id="input_races" name="race">
-        <option value="Human">Human</option>
-        <option value="Elf">Elf</option>
-        <option value="Dwarf">Dwarf</option>
-        <option value="Orc">Orc</option>
-        <option value="Giant">Giant</option>
-    </select>
-    <label for="input_professions">professions</label>
-    <select id="input_professions" name="profession">
-        <option value="Warrior">Warrior</option>
-        <option value="Rogue">Rogue</option>
-        <option value="Sorcerer">Sorcerer</option>
-        <option value="Mage">Mage</option>
-        <option value="Paladin">Paladin</option>
-    </select>
-
-<label for="input_level">level</label>
-<input type="number" id="input_level" name="level" min="0" max="100">
-
-    <input type="date" id="input_date" name="birthday">
-     <label for="input_banned">banned</label>
-<select id="input_banned" name="banned">
-        <option value='true'>true</option>
-        <option value='false'>false</option>
-    </select>
-    <button onclick="createPlayer2()">create</button>
+</h2>
+<label for="inputNameNew">Name:</label>
+<input type="text" id="inputNameNew" name="name" required size="12" maxlength="12">
+<br>
+<label for="inputTitleNew">Title:</label>
+<input type="text" id="inputTitleNew" name="title" required size="30" maxlength="30">
+<br>
+<label for='inputRaceNew'>Race:</label>
+<select id="inputRaceNew" name='race'>
+    <option value='HUMAN'>HUMAN</option>
+    <option value='DWARF'>DWARF</option>
+    <option value='ELF'>ELF</option>
+    <option value='GIANT'>GIANT</option>
+    <option value='ORC'>ORC</option>
+    <option value='TROLL'>TROLL</option>
+    <option value='HOBBIT'>HOBBIT</option>
+</select>
+<br>
+<label for="inputProfessionNew">Profession:</label>
+<select id="inputProfessionNew" name='profession'>
+    <option value='WARRIOR'>WARRIOR</option>
+    <option value='ROGUE'>ROGUE</option>
+    <option value='SORCERER'>SORCERER</option>
+    <option value='CLERIC'>CLERIC</option>
+    <option value='PALADIN'>PALADIN</option>
+    <option value='NAZGUL'>NAZGUL</option>
+    <option value='WARLOCK'>WARLOCK</option>
+    <option value='DRUID'>DRUID</option>
+</select>
+<br>
+<label for="inputLevelNew">Level:</label>
+<input type="number" id="inputLevelNew" name="level" min="0" max="100">
+<br>
+<label for="inputBirthdayNew">Birthday:</label>
+<input type="date" id="inputBirthdayNew" name="birthday" min="2000-01-01" max="3000-12-31">
+<br>
+<label for="inputBannedNew">Banned:</label>
+<select id="inputBannedNew" name='banned'>
+    <option value='true'>true</option>
+    <option value='false'>false</option>
+</select>
+<br>
+<span>
+    <button type="submit" onclick="createAcc()"><img src='/img/save.png'></button>
+</span>
 
 <script>
 
@@ -121,6 +132,7 @@
                     editIcon.onclick = function () {
                         editAccount(player.id);
                     };
+
                     editCell.appendChild(editIcon);
                     deleteCell.appendChild(deleteIcon);
                     numberCell.textContent = player.id;
@@ -209,22 +221,15 @@
 
 
     // с помощью jQuery обращаемся к элементам на странице по их именам
-    function createPlayer2() {
-        let val_name = $("#input_name").val();
-        let val_title = $("#input_title").val();
-        let val_race = $("#input_races").val();
-        let val_profession = $("#input_professions").val();
-        let val_level = $("#input_level").val();
-        let val_banned = $("#input_banned").val();
-        let val_birthday = $("#input_date").val();
+    function createAcc() {
+        let valueName = $("#inputNameNew").val();
+        let valueTitle = $("#inputTitleNew").val();
+        let valueRace = $("#inputRaceNew").val();
+        let valueProfession = $("#inputProfessionNew").val();
+        let valueLevel = $("#inputLevelNew").val();
+        let valueBirthday = $("#inputBirthdayNew").val();
+        let valueBanned = $("#inputBannedNew").val();
 
-        console.log(val_name);
-        console.log(val_title);
-        console.log(val_race);
-        console.log(val_profession);
-        console.log(val_level);
-        console.log(val_banned);
-        console.log(val_birthday);
         let url = "/rest/players";
         $.ajax({
             url: url,
@@ -233,25 +238,24 @@
             contentType: 'application/json;charset=UTF-8',
             async: false,
             data: JSON.stringify({
-                "name": val_name,
-                "title": val_title,
-                "race": val_race,
-                "profession": val_profession,
-                "banned": val_banned,
-                "level": val_level,
-                "birthday": new Date(val_birthday).getTime()
+                "name": valueName,
+                "title": valueTitle,
+                "race": valueRace,
+                "profession": valueProfession,
+                "level": valueLevel,
+                "birthday": new Date(valueBirthday).getTime(),
+                "banned": valueBanned
             }),
             success: function () {
-                $("#input_name").val("");
-                $("#input_title").val("");
-                $("#input_races").val("");
-                $("#input_professions").val("");
-                $("#input_level").val("");
-                $("#input_banned").val("");
-                $("#input_date").val("");
-           getPlayers();
+                $("#inputNameNew").val("");
+                $("#inputTitleNew").val("");
+                $("#selectRaceNew").val("");
+                $("#selectProfessionNew").val("");
+                $("#selectLevelNew").val("");
+                $("#selectBirthdayNew").val("");
+                $("#selectBannedNew").val("");
+                getPlayers();
             }
-
         });
     }
 
