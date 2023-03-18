@@ -95,7 +95,7 @@
 
 <script>
 
-
+    let pageNumber1;
     function getPlayers(pageNumber) {
         pageNumber = pageNumber || 8;
         let countPerPage = $("#accountsPerPage").val();
@@ -124,26 +124,43 @@
                     var deleteCell = row.insertCell(9);
                     editIcon = document.createElement('img');
                     deleteIcon = document.createElement('img');
+                    editIcon.id = player.id;
+                    deleteIcon.id = player.id + 100;
                     editIcon.src = '/img/edit.png';
                     deleteIcon.src = '/img/delete.png';
-                    deleteIcon.onclick = function () {
-                        deletePlayer(player.id);
-                    };
-                    editIcon.onclick = function () {
-                        editAccount(player.id);
-                    };
+
 
                     editCell.appendChild(editIcon);
                     deleteCell.appendChild(deleteIcon);
                     numberCell.textContent = player.id;
                     nameCell.textContent = player.name;
-                    titleCell.textContent = player.title;
-                    raceCell.textContent = player.race;
-                    professionCell.textContent = player.profession;
-                    levelCell.textContent = player.level;
-                    birthdayCell.textContent = player.birthday;
-                    bannedCell.textContent = player.banned;
+                    nameCell.id = player.id + "n";
 
+                    titleCell.textContent = player.title;
+
+                    titleCell.id = player.id + "t";
+
+                    raceCell.textContent = player.race;
+                    raceCell.id = player.id + "r";
+
+                    professionCell.textContent = player.profession;
+                    professionCell.id = player.id + "pr";
+
+                    levelCell.textContent = player.level;
+                    levelCell.id = player.id + "l";
+
+                    birthdayCell.textContent = player.birthday;
+                    birthdayCell.id = player.id + "b";
+
+                    bannedCell.textContent = player.banned;
+                    bannedCell.id = player.id + "ba";
+
+                    deleteIcon.onclick = function () {
+                        deletePlayer(player.id);
+                    };
+                    editIcon.onclick = function () {
+                        editAccount(player.id, nameCell.id, titleCell.id, raceCell.id, professionCell.id, bannedCell.id, birthdayCell.id, levelCell.id);
+                    };
                 });
 
             } else {
@@ -177,23 +194,23 @@
         $("#paging-buttons").empty()
 
         for (let i = 0; i < totalPages1; i++) {
-
-
             let button_tag = "<button>" + (i + 1) + "</button>";
             let btn = $(button_tag)
                 .attr("id", "paging_button_" + i)
                 .attr("onclick", "getPlayers(" + (i + 1) + ")")
                 .addClass("pgn-btn-styled");
-
             $("#paging-buttons").append(btn);
 
         }
 
 
         $(".pgn-btn-styled").on("click", function () {
-            $(".pgn-btn-styled").css("background-color", ""); // сбрасываем цвет всех кнопок
-            $(this).css("background-color", "red"); // окрашиваем нажатую кнопку в красный цвет
-
+            $(".pgn-btn-styled").css("background-color", "");
+            $(this).css("background-color", "red");
+            var button_id = $(this).attr("id"); // получаем id кнопки
+            var pageNumber2 = button_id.replace("paging_button_", "") ; // извлекаем номер кнопки из id
+            pageNumber1 =parseInt(pageNumber2)+1;
+            console.log(pageNumber1); // выводим номер кнопки в консоль
         });
 
 
@@ -204,7 +221,7 @@
             method: 'DELETE'
         })
             .then(function () {
-                getPlayers();
+                getPlayers(pageNumber1);
             })
             .catch(function (error) {
                 console.log(error);
@@ -213,9 +230,61 @@
 
 
 
+    function editAccount(id, id_name, id_Title, id_Race, id_Profession, id_Banned, id_date, id_level) {
+        let valueName = $("#inputNameNew").val(document.getElementById(id_name).textContent);
+        let valueTitle = $("#inputTitleNew").val(document.getElementById(id_Title).textContent);
+        let valueRace = $("#inputRaceNew").val(document.getElementById(id_Race).textContent);
+        let valueProfession = $("#inputProfessionNew").val(document.getElementById(id_Profession).textContent);
+        let valueLevel = $("#inputLevelNew").val(document.getElementById(id_level).textContent);
+        let valueBirthday = $("#inputBirthdayNew").val(document.getElementById(id_date).textContent);
+        let valueBanned = $("#inputBannedNew").val(document.getElementById(id_Banned).textContent);
 
 
+        let image = document.getElementById(id);
+        image.src = "/img/save.png";
+        let image1 = document.getElementById(id + 100);
+        image1.src = '';
 
+        image.onclick = function () {
+            saveAcc(id);
+        };
+
+    }
+
+
+    function saveAcc(id) {
+        let valueName = $("#inputNameNew").val();
+        let valueTitle = $("#inputTitleNew").val();
+        let valueRace = $("#inputRaceNew").val();
+        let valueProfession = $("#inputProfessionNew").val();
+        let valueBanned = $("#inputBannedNew").val();
+
+        let url = "/rest/players/" + id;
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            contentType: 'application/json;charset=UTF-8',
+            async: false,
+            data: JSON.stringify({
+                "name": valueName,
+                "title": valueTitle,
+                "race": valueRace,
+                "profession": valueProfession,
+                "banned": valueBanned
+            }),
+            success: function () {
+                $("#inputNameNew").val("");
+                $("#inputTitleNew").val("");
+                $("#selectRaceNew").val("");
+                $("#selectProfessionNew").val("");
+                $("#selectLevelNew").val("");
+                $("#selectBirthdayNew").val("");
+                $("#selectBannedNew").val("");
+                getPlayers(pageNumber1);
+            }
+        });
+    }
 
     // добавляем элементы на страницу
 
@@ -254,7 +323,7 @@
                 $("#selectLevelNew").val("");
                 $("#selectBirthdayNew").val("");
                 $("#selectBannedNew").val("");
-                getPlayers();
+                getPlayers(pageNumber1);
             }
         });
     }
