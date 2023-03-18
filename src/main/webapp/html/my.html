@@ -11,7 +11,7 @@
 <h1>RPG admin panel</h1>
 <div id="pagination">
     <label for="accountsPerPage">Show accounts per page:</label>
-    <select id="accountsPerPage" onchange="getPlayers()">
+    <select id="accountsPerPage" onchange="getPlayers(), main()">
         <option value="3">3</option>
         <option value="5" selected>5</option>
         <option value="10">10</option>
@@ -41,7 +41,6 @@
 
 <div id="paging-buttons">
     <label for="accountsPerPage">Pages:</label>
-
 </div>
 
 <div id="input">
@@ -97,15 +96,21 @@
 
     let pageNumber1;
     function getPlayers(pageNumber) {
-        if(pageNumber == null){
+        if (pageNumber == null) {
             pageNumber = 0;
         }
         let countPerPage = $("#accountsPerPage").val();
-        if(countPerPage == null){
+        if (countPerPage == null) {
             countPerPage = 3;
         }
-
-
+        $(".pgn-btn-styled").on("click", function () {
+            $(".pgn-btn-styled").css("background-color", "");
+            $(this).css("background-color", "red");
+            var button_id = $(this).attr("id"); // получаем id кнопки
+            var pageNumber2 = button_id.replace("paging_button_", ""); // извлекаем номер кнопки из id
+            pageNumber1 = parseInt(pageNumber2) ;
+            console.log(pageNumber1); // выводим номер кнопки в консоль
+        });
 
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '/rest/players?pageNumber=' + pageNumber + '&pageSize=' + countPerPage);
@@ -134,33 +139,23 @@
                     deleteIcon.id = player.id + 100;
                     editIcon.src = '/img/edit.png';
                     deleteIcon.src = '/img/delete.png';
-
-
                     editCell.appendChild(editIcon);
                     deleteCell.appendChild(deleteIcon);
                     numberCell.textContent = player.id;
                     nameCell.textContent = player.name;
                     nameCell.id = player.id + "n";
-
                     titleCell.textContent = player.title;
-
                     titleCell.id = player.id + "t";
-
                     raceCell.textContent = player.race;
                     raceCell.id = player.id + "r";
-
                     professionCell.textContent = player.profession;
                     professionCell.id = player.id + "pr";
-
                     levelCell.textContent = player.level;
                     levelCell.id = player.id + "l";
-
                     birthdayCell.textContent = player.birthday;
                     birthdayCell.id = player.id + "b";
-
                     bannedCell.textContent = player.banned;
                     bannedCell.id = player.id + "ba";
-
                     deleteIcon.onclick = function () {
                         deletePlayer(player.id);
                     };
@@ -168,29 +163,26 @@
                         editAccount(player.id, nameCell.id, titleCell.id, raceCell.id, professionCell.id, bannedCell.id, birthdayCell.id, levelCell.id);
                     };
                 });
-
             } else {
                 console.log('Ошибка: ' + xhr.status);
             }
         };
         xhr.send();
-        main();
+
     }
 
-
+    main();
     async function main() {
         let totalCount = await getTotalAccountCount();
         let countPerPage = $("#accountsPerPage").val();
         if (countPerPage == null) {
             countPerPage = 3;
         }
-
         async function getTotalAccountCount() {
             const data = await $.get("/rest/players/count");
             console.log("Total account count: " + data);
             return parseInt(data);
         }
-
 
         let totalPages1 = Math.ceil(totalCount / countPerPage);
 
@@ -203,21 +195,13 @@
             let button_tag = "<button>" + (i + 1) + "</button>";
             let btn = $(button_tag)
                 .attr("id", "paging_button_" + i)
-                .attr("onclick", "getPlayers(" + (i ) + ")")
+                .attr("onclick", "getPlayers(" + (i) + ")")
                 .addClass("pgn-btn-styled");
             $("#paging-buttons").append(btn);
 
         }
 
 
-        $(".pgn-btn-styled").on("click", function () {
-            $(".pgn-btn-styled").css("background-color", "");
-            $(this).css("background-color", "red");
-            var button_id = $(this).attr("id"); // получаем id кнопки
-            var pageNumber2 = button_id.replace("paging_button_", "") ; // извлекаем номер кнопки из id
-            pageNumber1 =parseInt(pageNumber2)+1;
-            console.log(pageNumber1); // выводим номер кнопки в консоль
-        });
 
 
     }
@@ -232,18 +216,19 @@
             .catch(function (error) {
                 console.log(error);
             });
+
+
     }
 
 
-
     function editAccount(id, id_name, id_Title, id_Race, id_Profession, id_Banned, id_date, id_level) {
-        let valueName = $("#inputNameNew").val(document.getElementById(id_name).textContent);
-        let valueTitle = $("#inputTitleNew").val(document.getElementById(id_Title).textContent);
-        let valueRace = $("#inputRaceNew").val(document.getElementById(id_Race).textContent);
-        let valueProfession = $("#inputProfessionNew").val(document.getElementById(id_Profession).textContent);
-        let valueLevel = $("#inputLevelNew").val(document.getElementById(id_level).textContent);
-        let valueBirthday = $("#inputBirthdayNew").val(document.getElementById(id_date).textContent);
-        let valueBanned = $("#inputBannedNew").val(document.getElementById(id_Banned).textContent);
+        $("#inputNameNew").val(document.getElementById(id_name).textContent);
+        $("#inputTitleNew").val(document.getElementById(id_Title).textContent);
+        $("#inputRaceNew").val(document.getElementById(id_Race).textContent);
+        $("#inputProfessionNew").val(document.getElementById(id_Profession).textContent);
+        $("#inputLevelNew").val(document.getElementById(id_level).textContent);
+        $("#inputBirthdayNew").val(document.getElementById(id_date).textContent);
+        $("#inputBannedNew").val(document.getElementById(id_Banned).textContent);
 
 
         let image = document.getElementById(id);
@@ -292,10 +277,7 @@
         });
     }
 
-    // добавляем элементы на страницу
 
-
-    // с помощью jQuery обращаемся к элементам на странице по их именам
     function createAcc() {
         let valueName = $("#inputNameNew").val();
         let valueTitle = $("#inputTitleNew").val();
