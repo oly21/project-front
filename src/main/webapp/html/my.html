@@ -97,9 +97,15 @@
 
     let pageNumber1;
     function getPlayers(pageNumber) {
-        pageNumber = pageNumber || 8;
+        if(pageNumber == null){
+            pageNumber = 0;
+        }
         let countPerPage = $("#accountsPerPage").val();
-        countPerPage = countPerPage || 5;
+        if(countPerPage == null){
+            countPerPage = 3;
+        }
+
+
 
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '/rest/players?pageNumber=' + pageNumber + '&pageSize=' + countPerPage);
@@ -197,7 +203,7 @@
             let button_tag = "<button>" + (i + 1) + "</button>";
             let btn = $(button_tag)
                 .attr("id", "paging_button_" + i)
-                .attr("onclick", "getPlayers(" + (i + 1) + ")")
+                .attr("onclick", "getPlayers(" + (i ) + ")")
                 .addClass("pgn-btn-styled");
             $("#paging-buttons").append(btn);
 
