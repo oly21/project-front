@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-
 <html>
 <head>
     <title>RPG</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
     <link href="/css/my.css" rel="stylesheet">
 </head>
@@ -34,15 +32,11 @@
     </tr>
     </thead>
     <tbody>
-
     </tbody>
 </table>
-
-
 <div id="paging-buttons">
-    <label for="accountsPerPage">Pages:</label>
+    <label for="paging-buttons">Pages:</label>
 </div>
-
 <div id="input">
     <label for="input">input</label>
 </div>
@@ -98,8 +92,6 @@
     let lastPageNumber = 0;
     let totalCount;
     function getPlayers(pageNumber) {
-
-
         if (pageNumber == null) {
             pageNumber = 1;
         }
@@ -117,6 +109,7 @@
             pageNumber1 = parseInt(pageNumber2) ;
             console.log(pageNumber1);
         });
+
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '/rest/players?pageNumber=' + pageNumber + '&pageSize=' + countPerPage);
         xhr.onload = function () {
@@ -173,7 +166,6 @@
             }
         };
         xhr.send();
-
     }
 
     main();
@@ -239,7 +231,6 @@
         image.onclick = function () {
             saveAcc(id);
         };
-
     }
 
 
@@ -316,8 +307,6 @@
             }
         });
     }
-
-
 </script>
 </body>
 </html>
